@@ -4,7 +4,7 @@ project (frances)
 
 ###############################################################################
 # for testing
-#find_package (Threads REQUIRED)
+find_package (Threads REQUIRED)
 #include (CTest)
 include (ExternalProject)
 
@@ -44,6 +44,18 @@ ExternalProject_Add (
 	INSTALL_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/libsignal/src/libsignal-protocol-c.a ${LIBSIGNAL_DIR}/
 )
 
+IF(APPLE AND ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+	set(common_SRCS ${common_SRCS}
+		test_common_ccrypto.c
+	)
+ELSE()
+	set(common_SRCS ${common_SRCS}
+		test_common_openssl.c
+	)
+	include_directories(${OPENSSL_INCLUDE_DIR})
+ENDIF()
+
+
 include_directories (${LIBSIGNAL_INCLUDE_DIR})
 
 set (LIBSIGNAL ${LIBSIGNAL_DIR}/libsignal-protocol-c.a)
@@ -54,8 +66,8 @@ include_directories (${LIBXML2_INCLUDE_DIR})
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/lib/DEBUG)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/lib/DEBUG) 
-set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
+set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
+set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 
 set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -pedantic -std=c99 -fPIC")
 
